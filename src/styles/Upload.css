@@ -1,0 +1,55 @@
+.projects-page {
+  padding: 40px;
+}
+
+.subtitle {
+  color: gray;
+  margin-bottom: 20px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.project-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.project-content {
+  padding: 15px;
+}
+
+.project-content h3 {
+  margin-bottom: 5px;
+}
+
+.tags span {
+  display: inline-block;
+  background: #e5efff;
+  color: #3b82f6;
+  padding: 5px 8px;
+  margin-right: 5px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.details-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+}

@@ -1,0 +1,387 @@
+/* =================================
+   SIDEBAR COMPONENT STYLES
+   ================================= */
+
+.sidebar {
+  /* Layout */
+  width: 240px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  
+  /* Styling */
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-right: 1px solid #e2e8f0;
+  padding: 20px;
+  gap: 20px;
+  
+  /* Z-index */
+  z-index: 1000;
+  
+  /* Scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Font */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", 
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Scrollbar styling */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* =================================
+   LOGO SECTION
+   ================================= */
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.logo-icon {
+  /* Size & Shape */
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  
+  /* Flexbox */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Styling */
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 1px;
+  
+  /* Effects */
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  flex-shrink: 0;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logo-text h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.logo-text p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* =================================
+   MENU ITEMS
+   ================================= */
+
+.sidebar-menu {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  
+  /* Reset list styles */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-item {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  
+  /* Sizing */
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  
+  /* Styling */
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  /* Transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Text */
+  text-align: left;
+  font-family: inherit;
+  
+  /* Remove focus outline (we'll use border instead) */
+  outline: none;
+}
+
+.menu-item:hover {
+  background: #f1f5f9;
+  color: #334155;
+  transform: translateX(4px);
+}
+
+.menu-item:active {
+  transform: translateX(2px);
+}
+
+.menu-item.active {
+  /* Styling */
+  background: #f0f7ff;
+  color: #3b82f6;
+  font-weight: 600;
+  
+  /* Shadow */
+  box-shadow: inset 0 0 0 1px #dbeafe, 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.menu-item.active:hover {
+  background: #e0f2fe;
+  transform: translateX(4px);
+}
+
+.menu-icon {
+  /* Sizing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  
+  /* Font */
+  font-size: 18px;
+  line-height: 1;
+}
+
+.menu-label {
+  /* Text */
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+/* =================================
+   LOGOUT BUTTON
+   ================================= */
+
+.logout-btn {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  
+  /* Sizing */
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  
+  /* Styling */
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  /* Transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Text */
+  text-align: left;
+  font-family: inherit;
+  
+  /* Border */
+  border: 1px solid #fee2e2;
+  
+  /* Remove focus outline */
+  outline: none;
+  
+  /* Margin */
+  margin-top: auto;
+}
+
+.logout-btn:hover {
+  background: #fecaca;
+  color: #dc2626;
+  border-color: #fca5a5;
+  transform: translateX(4px);
+}
+
+.logout-btn:active {
+  transform: translateX(2px);
+}
+
+/* =================================
+   RESPONSIVE DESIGN
+   ================================= */
+
+/* Tablet and smaller screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 220px;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .sidebar-logo {
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .logo-text h2 {
+    font-size: 14px;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+  }
+
+  .menu-item,
+  .logout-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .menu-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 200px;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .sidebar-logo {
+    gap: 10px;
+    margin-bottom: 6px;
+    padding-bottom: 10px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .logo-text h2 {
+    font-size: 13px;
+  }
+
+  .logo-text p {
+    font-size: 9px;
+  }
+
+  .menu-item,
+  .logout-btn {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .menu-label {
+    font-size: 12px;
+  }
+
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+  }
+}
+
+/* Extra small screens - hide labels, show only icons */
+@media (max-width: 380px) {
+  .sidebar {
+    width: 80px;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .sidebar-logo {
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menu-item,
+  .logout-btn {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .menu-label {
+    display: none;
+  }
+
+  .menu-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
