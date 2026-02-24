@@ -15,8 +15,8 @@ export default function Navbar() {
 
       <div>
         <Link to="/dashboard">Dashboard</Link>
-        <Link to="/add">Add Project</Link>
-        <Link to="/portfolio">Portfolio</Link>
+        <Link to="/upload">Upload Project</Link>
+        <Link to="/projects">My Projects</Link>
         <button onClick={handleLogout} className="logout-btn">
           Logout
         </button>

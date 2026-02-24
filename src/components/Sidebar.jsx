@@ -13,13 +13,13 @@ export default function Sidebar() {
     { path: "/profile", label: "My Profile", icon: "👤" },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.endsWith(path);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedIn");
     localStorage.removeItem("currentUser");
     localStorage.removeItem("userName");
-    window.location.href = "/";
+    navigate("/");
   };
 
   return (
@@ -39,7 +39,29 @@ export default function Sidebar() {
           <button
             key={item.path}
             className={`menu-item ${isActive(item.path) ? "active" : ""}`}
-            onClick={() => navigate(item.path)}
+            onClick={() => {
+              // Debug: log sidebar navigation attempts
+              try {
+                console.debug('Sidebar: navigate to', item.path, 'label=', item.label);
+              } catch (e) {}
+
+              // Attempt navigation
+              try {
+                navigate(item.path);
+
+                // Short timeout to check current location after navigation
+                setTimeout(() => {
+                  try {
+                    console.debug('Sidebar: after navigate window.location.pathname=', window.location.pathname);
+                    console.debug('Sidebar: react location.pathname=', window.location.pathname);
+                  } catch (e) {}
+                }, 150);
+
+                // NOTE: removed fallback history manipulation — rely on `navigate(item.path)`
+              } catch (e) {
+                console.debug('Sidebar: navigate exception', e);
+              }
+            }}
             title={item.label}
           >
             <span className="menu-icon">{item.icon}</span>

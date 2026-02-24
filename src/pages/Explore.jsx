@@ -7,6 +7,15 @@ export default function Explore() {
   const navigate = useNavigate();
   const location = useLocation();
   const [publicProjects, setPublicProjects] = useState([]);
+
+  // Normalize tech field to an array to avoid runtime errors when data is a string or missing
+  const normalizeTech = (tech) => {
+    if (Array.isArray(tech)) return tech;
+    if (typeof tech === 'string') {
+      return tech.split(',').map(t => t.trim()).filter(Boolean);
+    }
+    return [];
+  };
   
   useEffect(() => {
     // Scroll to top when page loads
@@ -239,9 +248,9 @@ export default function Explore() {
                         {project.description || project.desc || "No description available"}
                       </p>
                       
-                      {project.tech && project.tech.length > 0 && (
+                      {normalizeTech(project.tech).length > 0 && (
                         <div className="explore-tech-tags">
-                          {project.tech.map((tech, i) => (
+                          {normalizeTech(project.tech).map((tech, i) => (
                             <span key={i} className="explore-tech-tag">{tech}</span>
                           ))}
                         </div>

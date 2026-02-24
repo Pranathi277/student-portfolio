@@ -7,6 +7,13 @@ export default function MyProjects() {
   const navigate = useNavigate();
   const location = useLocation();
   const [projects, setProjects] = useState([]);
+  const [showDebug, setShowDebug] = useState(false);
+
+  const normalizeTech = (tech) => {
+    if (Array.isArray(tech)) return tech;
+    if (typeof tech === 'string') return tech.split(',').map(t => t.trim()).filter(Boolean);
+    return [];
+  };
   
   const email = localStorage.getItem("currentUser") || "user@gmail.com";
   const userName = localStorage.getItem("userName") || email.split("@")[0];
@@ -41,6 +48,11 @@ export default function MyProjects() {
     
     loadUserProjects();
   }, [location.pathname, navigate]); // Refresh when navigating to this page
+
+  const viewProject = (id) => {
+    console.debug("MyProjects: navigating to project id=", id);
+    navigate(`/project/${id}`);
+  };
 
   const deleteProject = (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
@@ -87,6 +99,16 @@ export default function MyProjects() {
           <h1>My Portfolio</h1>
           <p>Showcase of your {projects.length} amazing {projects.length === 1 ? 'project' : 'projects'}</p>
 
+          {/* Debug toggle - remove in production */}
+          <div style={{ marginTop: 8 }}>
+            <button
+              style={{ fontSize: 12, padding: '6px 10px' }}
+              onClick={() => setShowDebug(s => !s)}
+            >
+              {showDebug ? 'Hide' : 'Show'} Debug Info
+            </button>
+          </div>
+
           {projects.length === 0 ? (
             <div className="empty-state">
               <p>📁 You haven't uploaded any projects yet.</p>
@@ -116,20 +138,20 @@ export default function MyProjects() {
                     <p className="project-description">
                       {project.description || project.desc || "No description"}
                     </p>
-                    {project.tech && project.tech.length > 0 && (
+                    {normalizeTech(project.tech).length > 0 && (
                       <div className="tech-tags">
-                        {project.tech.slice(0, 3).map((tech, i) => (
+                        {normalizeTech(project.tech).slice(0, 3).map((tech, i) => (
                           <span key={i} className="tech-tag">{tech}</span>
                         ))}
-                        {project.tech.length > 3 && (
-                          <span className="tech-tag more">+{project.tech.length - 3}</span>
+                        {normalizeTech(project.tech).length > 3 && (
+                          <span className="tech-tag more">+{normalizeTech(project.tech).length - 3}</span>
                         )}
                       </div>
                     )}
                     <div className="project-card-actions">
                       <button
                         className="view-details-btn"
-                        onClick={() => navigate(`/project/${project.id}`)}
+                        onClick={() => viewProject(project.id)}
                       >
                         View Details 🔗
                       </button>
@@ -143,6 +165,29 @@ export default function MyProjects() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {showDebug && (
+            <div className="debug-panel" style={{ marginTop: 20, background: '#fff7ed', padding: 12, borderRadius: 8 }}>
+              <h3 style={{ margin: 0 }}>Debug: Stored Projects</h3>
+              <p style={{ marginTop: 6, marginBottom: 8, color: '#6b7280' }}>Click an ID to navigate to its details.</p>
+              <div style={{ maxHeight: 220, overflow: 'auto' }}>
+                {projects.length === 0 ? (
+                  <p style={{ color: '#6b7280' }}>No projects in localStorage for current user.</p>
+                ) : (
+                  <ul style={{ paddingLeft: 16, margin: 0 }}>
+                    {projects.map((p) => (
+                      <li key={String(p.id)} style={{ marginBottom: 6 }}>
+                        <strong>{p.title || '(no title)'}</strong>
+                        <div style={{ fontSize: 12, color: '#374151' }}>
+                          ID: <button style={{ fontSize: 12, marginLeft: 6 }} onClick={() => viewProject(p.id)}>{String(p.id)}</button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           )}
         </div>

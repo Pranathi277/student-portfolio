@@ -22,17 +22,34 @@ export default function ProjectDetails() {
 
     // Get project and increment views
     const projects = JSON.parse(localStorage.getItem("projects")) || [];
-    const foundProject = projects.find((p) => p.id === id);
+
+    // Robust id matching: handle numeric/string ids and mixed types
+    const foundProject = projects.find((p) => {
+      if (!p || p.id === undefined || p.id === null) return false;
+      // match exact
+      if (p.id === id) return true;
+      // match after coercion
+      if (String(p.id) === String(id)) return true;
+      if (Number(p.id) === Number(id) && !Number.isNaN(Number(id))) return true;
+      return false;
+    });
 
     if (foundProject) {
       // Increment views
-      const updatedProjects = projects.map(p => 
-        p.id === id ? { ...p, views: (p.views || 0) + 1 } : p
-      );
+      const updatedProjects = projects.map((p) => {
+        const matches = (p.id === id) || (String(p.id) === String(id)) || (Number(p.id) === Number(id) && !Number.isNaN(Number(id)));
+        return matches ? { ...p, views: (p.views || 0) + 1 } : p;
+      });
       localStorage.setItem("projects", JSON.stringify(updatedProjects));
       
-      // Set the updated project
-      setProject(updatedProjects.find((p) => p.id === id));
+      // Set the updated project (use the updated array to get consistent views)
+      setProject(updatedProjects.find((p) => String(p.id) === String(id)));
+    } else {
+      // Debugging aid: log available projects and current user so issues can be diagnosed in console
+      // Remove or disable these logs in production
+      console.debug("ProjectDetails: project not found for id=", id);
+      console.debug("ProjectDetails: stored projects ids=", projects.map(p => p && p.id));
+      console.debug("ProjectDetails: currentUser=", localStorage.getItem("currentUser"));
     }
   }, [id, navigate]);
 
@@ -52,6 +69,12 @@ export default function ProjectDetails() {
 
   const email = localStorage.getItem("currentUser") || "user@gmail.com";
   const userName = localStorage.getItem("userName") || email.split("@")[0];
+
+  const normalizeTech = (tech) => {
+    if (Array.isArray(tech)) return tech;
+    if (typeof tech === 'string') return tech.split(',').map(t => t.trim()).filter(Boolean);
+    return [];
+  };
 
   return (
     <div className="layout">
@@ -116,8 +139,8 @@ export default function ProjectDetails() {
                 <div className="sidebar-card">
                   <h3>Technology Stack</h3>
                   <div className="tech-stack-list">
-                    {project.tech && project.tech.length > 0 ? (
-                      project.tech.map((tech, i) => (
+                    {normalizeTech(project.tech).length > 0 ? (
+                      normalizeTech(project.tech).map((tech, i) => (
                         <span key={i} className="tech-badge">{tech}</span>
                       ))
                     ) : (
