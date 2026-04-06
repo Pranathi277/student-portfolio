@@ -28,126 +28,34 @@ export default function Explore() {
       return;
     }
     
-    // Page loaded successfully - continue with initialization
-    
-    // Initialize sample projects if they don't exist
-    const initializeSampleProjects = () => {
-      const existingProjects = JSON.parse(localStorage.getItem("projects")) || [];
-      const sampleProjectsExist = existingProjects.some(p => p.id && p.id.startsWith("sample-"));
-      
-      if (!sampleProjectsExist) {
-        const sampleProjects = [
-          {
-            id: "sample-1",
-            title: "Task Management App",
-            description: "A collaborative task management application inspired by Trello. Built with React, TypeScript, and Firebase. Features real-time updates, drag-and-drop functionality, team collaboration, file attachments, and deadline tracking.",
-            desc: "A collaborative task management application inspired by Trello. Built with React, TypeScript, and Firebase. Features real-time updates, drag-and-drop functionality, team collaboration, file attachments, and deadline tracking.",
-            image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=400&fit=crop",
-            github: "https://github.com/alexjohnson/task-manager",
-            tech: ["React", "TypeScript", "Firebase", "Tailwind CSS"],
-            date: "Feb 13, 2024",
-            views: 168,
-            public: true,
-            author: "Alex Johnson",
-            authorEmail: "alex.johnson@university.edu"
-          },
-          {
-            id: "sample-2",
-            title: "Weather Forecast Dashboard",
-            description: "A beautiful weather dashboard that displays current weather conditions and 7-day forecasts. Uses OpenWeather API for data. Includes location search, favorite locations, interactive charts showing temperature trends, and weather alerts.",
-            desc: "A beautiful weather dashboard that displays current weather conditions and 7-day forecasts. Uses OpenWeather API for data. Includes location search, favorite locations, interactive charts showing temperature trends, and weather alerts.",
-            image: "https://images.unsplash.com/photo-1419837723367-08e69e6d78ec?w=800&h=400&fit=crop",
-            github: "https://github.com/sarahwilliams/weather-dashboard",
-            tech: ["React", "Chart.js", "OpenWeather API", "CSS3"],
-            date: "Jan 28, 2024",
-            views: 234,
-            public: true,
-            author: "Sarah Williams",
-            authorEmail: "sarah.williams@university.edu"
-          },
-          {
-            id: "sample-3",
-            title: "E-Commerce Platform",
-            description: "Full-stack e-commerce solution with payment integration. Features include product catalog, shopping cart, user authentication, order management, and Stripe payment processing. Built with modern web technologies.",
-            desc: "Full-stack e-commerce solution with payment integration. Features include product catalog, shopping cart, user authentication, order management, and Stripe payment processing. Built with modern web technologies.",
-            image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop",
-            github: "https://github.com/michaelchen/ecommerce",
-            tech: ["React", "Node.js", "MongoDB", "Express", "Stripe"],
-            date: "Mar 5, 2024",
-            views: 312,
-            public: true,
-            author: "Michael Chen",
-            authorEmail: "michael.chen@university.edu"
-          },
-          {
-            id: "sample-4",
-            title: "Social Media Analytics Tool",
-            description: "Comprehensive analytics dashboard for social media metrics. Tracks engagement, follower growth, post performance, and provides insights. Integrates with multiple social media APIs and generates detailed reports.",
-            desc: "Comprehensive analytics dashboard for social media metrics. Tracks engagement, follower growth, post performance, and provides insights. Integrates with multiple social media APIs and generates detailed reports.",
-            image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
-            github: "https://github.com/emilydavis/social-analytics",
-            tech: ["Vue.js", "Python", "Django", "PostgreSQL", "D3.js"],
-            date: "Feb 20, 2024",
-            views: 189,
-            public: true,
-            author: "Emily Davis",
-            authorEmail: "emily.davis@university.edu"
-          },
-          {
-            id: "sample-5",
-            title: "Recipe Sharing Platform",
-            description: "Community-driven recipe sharing platform where users can upload, rate, and discover recipes. Features include recipe search, meal planning, shopping list generation, and nutritional information calculation.",
-            desc: "Community-driven recipe sharing platform where users can upload, rate, and discover recipes. Features include recipe search, meal planning, shopping list generation, and nutritional information calculation.",
-            image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=400&fit=crop",
-            github: "https://github.com/davidkim/recipe-platform",
-            tech: ["Next.js", "Prisma", "PostgreSQL", "AWS S3"],
-            date: "Jan 15, 2024",
-            views: 445,
-            public: true,
-            author: "David Kim",
-            authorEmail: "david.kim@university.edu"
-          }
-        ];
-        
-        const updatedProjects = [...existingProjects, ...sampleProjects];
-        localStorage.setItem("projects", JSON.stringify(updatedProjects));
-      }
-    };
-    
-    // Initialize sample projects
-    initializeSampleProjects();
-    
     // Load other users' public projects
-    const loadPublicProjects = () => {
-      const allProjects = JSON.parse(localStorage.getItem("projects")) || [];
-      const currentUserEmail = localStorage.getItem("currentUser");
-      
-      const filtered = allProjects.filter(p => {
-        // Must be public
-        if (p.public === false) return false;
-        
-        // Exclude current user's projects
-        if (p.authorEmail && p.authorEmail === currentUserEmail) return false;
-        
-        // Include projects from other users
-        return true;
-      });
-      
-      setPublicProjects(filtered);
+    const loadPublicProjects = async () => {
+      try {
+        const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects");
+        if (response.ok) {
+          const allProjects = await response.json();
+          const currentUserEmail = localStorage.getItem("currentUser");
+          
+          const filtered = allProjects.filter(p => {
+            // Must be public (note the API sends back isPublic)
+            if (p.isPublic === false && p.public === false) return false;
+            
+            // Exclude current user's projects
+            if (p.authorEmail && p.authorEmail === currentUserEmail) return false;
+            
+            // Include projects from other users
+            return true;
+          });
+          
+          setPublicProjects(filtered);
+        }
+      } catch (error) {
+        console.error("Error fetching projects", error);
+      }
     };
     
     loadPublicProjects();
     
-    // Listen for storage changes
-    const handleStorageChange = () => {
-      loadPublicProjects();
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, [location.pathname]); // Refresh when navigating to this page
   
   const email = localStorage.getItem("currentUser") || "user@gmail.com";

@@ -66,7 +66,7 @@ export default function UploadProject() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate required fields
@@ -88,38 +88,37 @@ export default function UploadProject() {
     setIsSubmitting(true);
     
     try {
-      const projects = JSON.parse(localStorage.getItem("projects")) || [];
-      
-      // Use uploaded image (base64), or fallback to URL, or placeholder
       const projectImage = imagePreview || formData.image || "https://via.placeholder.com/800x400";
       
       const newProject = {
-        id: Date.now().toString(),
         title: formData.title.trim(),
         description: formData.description.trim(),
-        desc: formData.description.trim(),
         image: projectImage,
         github: formData.github.trim(),
         tech: formData.tech.split(",").map(t => t.trim()).filter(t => t),
         date: new Date().toLocaleDateString(),
         views: 0,
-        public: formData.public,
+        isPublic: formData.public,
         author: userName,
         authorEmail: email
       };
 
-      projects.push(newProject);
-      localStorage.setItem("projects", JSON.stringify(projects));
+      await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProject)
+      });
       
       // Add to recent activities
-      const activities = JSON.parse(localStorage.getItem("activities")) || [];
-      activities.unshift({
-        type: "Uploaded new project",
-        projectTitle: formData.title,
-        timestamp: new Date().toISOString()
+      await fetch(import.meta.env.VITE_API_BASE_URL + "/api/activities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "Uploaded new project",
+          projectTitle: formData.title,
+          timestamp: new Date().toISOString()
+        })
       });
-      const limitedActivities = activities.slice(0, 50);
-      localStorage.setItem("activities", JSON.stringify(limitedActivities));
       
       // Reset form
       setFormData({

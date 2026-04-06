@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 
 import React from "react";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import UploadProject from "./pages/UploadProject";
 import MyProjects from "./pages/MyProjects";
@@ -12,15 +13,15 @@ import Profile from "./pages/Profile";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
-  const basename = import.meta.env.PROD ? '/student-portfolio' : '/';
   return (
-    <BrowserRouter basename={basename}>
+    <HashRouter>
       <ErrorBoundary>
       <Routes>
 
         {/* AUTH */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* APP */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -32,7 +33,7 @@ function App() {
 
       </Routes>
       </ErrorBoundary>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

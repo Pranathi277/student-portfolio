@@ -20,37 +20,23 @@ export default function ProjectDetails() {
       return;
     }
 
-    // Get project and increment views
-    const projects = JSON.parse(localStorage.getItem("projects")) || [];
-
-    // Robust id matching: handle numeric/string ids and mixed types
-    const foundProject = projects.find((p) => {
-      if (!p || p.id === undefined || p.id === null) return false;
-      // match exact
-      if (p.id === id) return true;
-      // match after coercion
-      if (String(p.id) === String(id)) return true;
-      if (Number(p.id) === Number(id) && !Number.isNaN(Number(id))) return true;
-      return false;
-    });
-
-    if (foundProject) {
-      // Increment views
-      const updatedProjects = projects.map((p) => {
-        const matches = (p.id === id) || (String(p.id) === String(id)) || (Number(p.id) === Number(id) && !Number.isNaN(Number(id)));
-        return matches ? { ...p, views: (p.views || 0) + 1 } : p;
-      });
-      localStorage.setItem("projects", JSON.stringify(updatedProjects));
-      
-      // Set the updated project (use the updated array to get consistent views)
-      setProject(updatedProjects.find((p) => String(p.id) === String(id)));
-    } else {
-      // Debugging aid: log available projects and current user so issues can be diagnosed in console
-      // Remove or disable these logs in production
-      console.debug("ProjectDetails: project not found for id=", id);
-      console.debug("ProjectDetails: stored projects ids=", projects.map(p => p && p.id));
-      console.debug("ProjectDetails: currentUser=", localStorage.getItem("currentUser"));
-    }
+    const fetchProject = async () => {
+      try {
+        const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects");
+        if (response.ok) {
+          const allProjects = await response.json();
+          const foundProject = allProjects.find((p) => String(p.id) === String(id));
+          if (foundProject) {
+            setProject(foundProject);
+          } else {
+            console.debug("ProjectDetails: project not found for id=", id);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching project details");
+      }
+    };
+    fetchProject();
   }, [id, navigate]);
 
   if (!project) {

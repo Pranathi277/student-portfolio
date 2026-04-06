@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "../styles/dashboard.css";
@@ -21,8 +21,24 @@ export default function Profile() {
   const email = localStorage.getItem("currentUser") || "user@gmail.com";
   const name = email.split("@")[0];
   const user = JSON.parse(localStorage.getItem("user")) || {};
-  const projects = JSON.parse(localStorage.getItem("projects")) || [];
-  const myProjects = projects.length;
+  const [projectsCount, setProjectsCount] = useState(0);
+  const [publicProjectsCount, setPublicProjectsCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${email}`);
+        if(res.ok) {
+          const userProjects = await res.json();
+          setProjectsCount(userProjects.length);
+          setPublicProjectsCount(userProjects.filter(p => p.isPublic !== false).length);
+        }
+      } catch(e) {
+        console.error("Error fetching stats", e);
+      }
+    };
+    if (email) fetchStats();
+  }, [email]);
 
   return (
     <div className="layout">
@@ -46,12 +62,12 @@ export default function Profile() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginTop: "30px" }}>
               <div style={{ padding: "20px", background: "#f8f9fa", borderRadius: "8px" }}>
                 <h3 style={{ margin: 0, color: "#666" }}>Total Projects</h3>
-                <p style={{ fontSize: "32px", fontWeight: "bold", margin: "10px 0 0 0" }}>{myProjects}</p>
+                <p style={{ fontSize: "32px", fontWeight: "bold", margin: "10px 0 0 0" }}>{projectsCount}</p>
               </div>
               <div style={{ padding: "20px", background: "#f8f9fa", borderRadius: "8px" }}>
                 <h3 style={{ margin: 0, color: "#666" }}>Public Projects</h3>
                 <p style={{ fontSize: "32px", fontWeight: "bold", margin: "10px 0 0 0" }}>
-                  {projects.filter(p => p.public !== false).length}
+                  {publicProjectsCount}
                 </p>
               </div>
             </div>

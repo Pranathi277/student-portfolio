@@ -6,12 +6,39 @@ export default function Signup() {
   const navigate = useNavigate();
   const [user, setUser] = useState({ name: "", email: "", password: "" });
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("userName", user.name);
-    alert("Signup Successful!");
-    navigate("/");
+
+    try {
+      const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.name,
+          email: user.email,
+          password: user.password,
+          summary: "New User",
+        }),
+      });
+
+      if (response.ok) {
+        const savedUser = await response.json();
+        // Since it's just signup, maybe they need to login or we log them in implicitly
+        // We'll just guide them to login to be safe, or log them in directly
+        localStorage.setItem("user", JSON.stringify(savedUser));
+        localStorage.setItem("userName", savedUser.name);
+        
+        alert("Signup Successful! You can now login.");
+        navigate("/");
+      } else {
+        alert("Signup failed. Email might already be in use.");
+      }
+    } catch (error) {
+      console.error("Backend error:", error);
+      alert("Server error. Please try again later.");
+    }
   };
 
   return (

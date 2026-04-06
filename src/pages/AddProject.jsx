@@ -10,27 +10,24 @@ export default function AddProject() {
   const [desc, setDesc] = useState("");
 
   const saveProject = () => {
-    const projects =
-      JSON.parse(localStorage.getItem("projects")) || [];
-
-    const newProject = {
-      id: Date.now().toString(),
-      title,
-      desc,
+  fetch("http://localhost:8089/projects", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      title: title,
       description: desc,
-      image: "https://via.placeholder.com/800x400",
-      github: "",
-      tech: [],
-      date: new Date().toLocaleDateString(),
-      views: 0,
-      public: true
-    };
-
-    projects.push(newProject);
-
-    localStorage.setItem("projects", JSON.stringify(projects));
-    navigate("/dashboard");
-  };
+      student: {
+        id: 2
+      }
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    navigate("/my-projects"); // keep your flow
+  });
+};
 
   return (
     <div className="form">

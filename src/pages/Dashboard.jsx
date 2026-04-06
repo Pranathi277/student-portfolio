@@ -23,8 +23,26 @@ export default function Dashboard() {
   const userName = localStorage.getItem("userName") || email.split("@")[0];
   const name = userName.split(" ")[0]; // Get first name
 
-  const projects = JSON.parse(localStorage.getItem("projects")) || [];
-  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+  const [projects, setProjects] = useState([]);
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const projRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${email}`);
+        if (projRes.ok) setProjects(await projRes.json());
+        
+        const actRes = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/activities");
+        if (actRes.ok) {
+           const allActivities = await actRes.json();
+           setActivities(allActivities);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    if (email) fetchData();
+  }, [email]);
 
   useEffect(() => {
     // Get recent activities (last 24 hours) and format time ago
@@ -44,6 +62,12 @@ export default function Dashboard() {
 
     const last24Hours = activities
       .filter(activity => {
+        // Only show activities related to the current user's projects
+        const isMyProject = projects.some(p => p.title === activity.projectTitle);
+        if (!isMyProject && projects.length > 0) return false;
+        // If projects is empty, don't show any activities
+        if (projects.length === 0) return false;
+
         const activityTime = new Date(activity.timestamp);
         const now = new Date();
         const diffHours = (now - activityTime) / (1000 * 60 * 60);
@@ -56,7 +80,7 @@ export default function Dashboard() {
       .slice(0, 5); // Show last 5
     
     setRecentActivities(last24Hours);
-  }, [activities]);
+  }, [activities, projects]);
 
   const totalProjects = projects.length;
   const publicProjects = projects.filter(p => p.public !== false).length;

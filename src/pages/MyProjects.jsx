@@ -18,21 +18,17 @@ export default function MyProjects() {
   const email = localStorage.getItem("currentUser") || "user@gmail.com";
   const userName = localStorage.getItem("userName") || email.split("@")[0];
 
-  const loadUserProjects = () => {
-    // Get only projects uploaded by the current user
-    const stored = JSON.parse(localStorage.getItem("projects")) || [];
+  const loadUserProjects = async () => {
     const currentUserEmail = localStorage.getItem("currentUser");
-    
-    // Filter projects: show only those uploaded by current user
-    const userProjects = stored.filter(project => {
-      if (project.authorEmail) {
-        return project.authorEmail === currentUserEmail;
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${currentUserEmail}`);
+      if (response.ok) {
+        const userProjects = await response.json();
+        setProjects(userProjects);
       }
-      // For projects without authorEmail (old projects), include them for backward compatibility
-      return true;
-    });
-    
-    setProjects(userProjects);
+    } catch (error) {
+      console.error("Failed to load user projects", error);
+    }
   };
 
   useEffect(() => {
@@ -54,14 +50,14 @@ export default function MyProjects() {
     navigate(`/project/${id}`);
   };
 
-  const deleteProject = (id) => {
+  const deleteProject = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
-      const allProjects = JSON.parse(localStorage.getItem("projects")) || [];
-      const updated = allProjects.filter((p) => p.id !== id);
-      localStorage.setItem("projects", JSON.stringify(updated));
-      
-      // Reload user projects
-      loadUserProjects();
+      try {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/${id}`, { method: 'DELETE' });
+        loadUserProjects();
+      } catch (error) {
+        console.error("Failed to delete project", error);
+      }
     }
   };
 
