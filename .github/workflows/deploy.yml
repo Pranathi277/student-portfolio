@@ -8,13 +8,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,6 +32,13 @@ jobs:
       - name: Build project
         run: npm run build
 
+      # ✅ FIX 1: Add Git identity
+      - name: Set Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ✅ FIX 2: Correct token
       - name: Deploy to GitHub Pages
         run: npm run deploy
         env:
