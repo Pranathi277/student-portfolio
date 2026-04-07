@@ -13,10 +13,6 @@ export default function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [userCaptcha, setUserCaptcha] = useState("");
 
-  useEffect(() => {
-    generateCaptcha();
-  }, []);
-
   const generateCaptcha = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
     let result = '';
@@ -27,6 +23,10 @@ export default function Login() {
     setCaptchaAnswer(result);
     setUserCaptcha("");
   };
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "pre-deploy": "npm run build",
-    "deploy": "gh-pages -d dist -u \"github-actions[bot] <github-actions[bot]@users.noreply.github.com>\""
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.0",

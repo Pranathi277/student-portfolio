@@ -48,7 +48,7 @@ export default function ForgotPassword() {
       const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp, newPassword })
+        body: JSON.stringify({ email: email.trim(), otp: otp.trim(), newPassword })
       });
       const data = await response.json();
       

@@ -10,7 +10,7 @@ export default function AddProject() {
   const [desc, setDesc] = useState("");
 
   const saveProject = () => {
-  fetch("http://localhost:8089/projects", {
+  fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
