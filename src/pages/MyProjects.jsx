@@ -49,7 +49,7 @@ export default function MyProjects() {
     console.debug("MyProjects: navigating to project id=", id);
     navigate(`/project/${id}`);
   };
-
+//crud operation -Delete
   const deleteProject = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {

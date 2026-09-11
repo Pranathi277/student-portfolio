@@ -54,9 +54,11 @@ export default function Login() {
 
         localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("userName", data.name);
+        //Authentication state management
+        //sm - track the user data and login status in localStorage for session persistence across page reloads and browser sessions. This allows the app to remember the user and maintain their logged-in state until they choose to log out or clear their browser data.
         localStorage.setItem("currentUser", data.email);
         localStorage.setItem("loggedIn", "true");
-
+//error handling - alert for successful login and invalid credentials
         alert("Login Successful!");
         navigate("/dashboard"); // keep safe (or "/dashboard" if exists)
       } else {

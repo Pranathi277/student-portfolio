@@ -109,7 +109,7 @@ export default function UploadProject() {
         body: JSON.stringify(newProject)
       });
       
-      // Add to recent activities
+//crud operation -Post-to delete the project
       await fetch(import.meta.env.VITE_API_BASE_URL + "/api/activities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
