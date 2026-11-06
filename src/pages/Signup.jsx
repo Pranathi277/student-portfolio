@@ -1,43 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 import "../styles/login.css";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [user, setUser] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: user.name,
-          email: user.email,
-          password: user.password,
-          summary: "New User",
-        }),
+      const result = await apiService.signup({
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        summary: "New User",
       });
 
-      if (response.ok) {
-        const savedUser = await response.json();
-        // Since it's just signup, maybe they need to login or we log them in implicitly
-        // We'll just guide them to login to be safe, or log them in directly
-        localStorage.setItem("user", JSON.stringify(savedUser));
-        localStorage.setItem("userName", savedUser.name);
+      if (result.success) {
+        localStorage.setItem("user", JSON.stringify(result.user));
+        localStorage.setItem("userName", result.user.name);
         
         alert("Signup Successful! You can now login.");
         navigate("/");
       } else {
-        alert("Signup failed. Email might already be in use.");
+        alert(result.message || "Signup failed. Please try again.");
       }
     } catch (error) {
-      console.error("Backend error:", error);
-      alert("Server error. Please try again later.");
+      console.error("Signup error:", error);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +72,9 @@ export default function Signup() {
             required
           />
 
-          <button type="submit" className="login-btn">Sign Up</button>
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Signing Up..." : "Sign Up"}
+          </button>
         </form>
 
         <p className="signup-text">

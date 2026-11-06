@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
 import "../styles/dashboard.css";
 import "../styles/ProjectDetails.css";
 
@@ -22,18 +23,15 @@ export default function ProjectDetails() {
 
     const fetchProject = async () => {
       try {
-        const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects");
-        if (response.ok) {
-          const allProjects = await response.json();
-          const foundProject = allProjects.find((p) => String(p.id) === String(id));
-          if (foundProject) {
-            setProject(foundProject);
-          } else {
-            console.debug("ProjectDetails: project not found for id=", id);
-          }
+        const allProjects = await apiService.getAllProjects();
+        const foundProject = (allProjects || []).find((p) => String(p.id) === String(id));
+        if (foundProject) {
+          setProject(foundProject);
+        } else {
+          console.debug("ProjectDetails: project not found for id=", id);
         }
       } catch (err) {
-        console.error("Error fetching project details");
+        console.error("Error fetching project details", err);
       }
     };
     fetchProject();

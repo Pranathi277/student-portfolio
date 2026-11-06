@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
 import "../styles/dashboard.css";
 
 export default function Explore() {
@@ -31,24 +32,21 @@ export default function Explore() {
     // Load other users' public projects
     const loadPublicProjects = async () => {
       try {
-        const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects");
-        if (response.ok) {
-          const allProjects = await response.json();
-          const currentUserEmail = localStorage.getItem("currentUser");
+        const allProjects = await apiService.getAllProjects();
+        const currentUserEmail = localStorage.getItem("currentUser");
+        
+        const filtered = (allProjects || []).filter(p => {
+          // Must be public (note the API sends back isPublic or public)
+          if (p.isPublic === false && p.public === false) return false;
           
-          const filtered = allProjects.filter(p => {
-            // Must be public (note the API sends back isPublic)
-            if (p.isPublic === false && p.public === false) return false;
-            
-            // Exclude current user's projects
-            if (p.authorEmail && p.authorEmail === currentUserEmail) return false;
-            
-            // Include projects from other users
-            return true;
-          });
+          // Exclude current user's projects if email is present
+          if (p.authorEmail && currentUserEmail && p.authorEmail.toLowerCase() === currentUserEmail.toLowerCase()) return false;
           
-          setPublicProjects(filtered);
-        }
+          // Include projects from other users
+          return true;
+        });
+        
+        setPublicProjects(filtered);
       } catch (error) {
         console.error("Error fetching projects", error);
       }

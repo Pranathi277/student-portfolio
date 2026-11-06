@@ -2,6 +2,7 @@ import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -29,14 +30,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const projRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${email}`);
-        if (projRes.ok) setProjects(await projRes.json());
+        const userProjects = await apiService.getUserProjects(email);
+        setProjects(userProjects || []);
         
-        const actRes = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/activities");
-        if (actRes.ok) {
-           const allActivities = await actRes.json();
-           setActivities(allActivities);
-        }
+        const allActivities = await apiService.getActivities();
+        setActivities(allActivities || []);
       } catch (err) {
         console.error("Error fetching data:", err);
       }

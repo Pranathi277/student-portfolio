@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
 import "../styles/dashboard.css";
 
 export default function Profile() {
@@ -27,13 +28,12 @@ export default function Profile() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${email}`);
-        if(res.ok) {
-          const userProjects = await res.json();
+        const userProjects = await apiService.getUserProjects(email);
+        if (userProjects) {
           setProjectsCount(userProjects.length);
-          setPublicProjectsCount(userProjects.filter(p => p.isPublic !== false).length);
+          setPublicProjectsCount(userProjects.filter(p => p.isPublic !== false && p.public !== false).length);
         }
-      } catch(e) {
+      } catch (e) {
         console.error("Error fetching stats", e);
       }
     };

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 import "../styles/login.css";
 
 export default function ForgotPassword() {
@@ -17,21 +18,15 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert("OTP sent! Please check your email (or backend console if testing locally).");
+      const result = await apiService.forgotPassword(email);
+      if (result.success) {
+        alert(result.message);
         setStep(2);
       } else {
-        alert(data.message || "Error sending OTP");
+        alert(result.message || "Error sending OTP");
       }
     } catch (err) {
-      alert("Server error");
+      alert("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -45,21 +40,15 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), otp: otp.trim(), newPassword })
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert("Password reset successfully! You can now login.");
+      const result = await apiService.resetPassword({ email, otp, newPassword });
+      if (result.success) {
+        alert(result.message || "Password reset successfully! You can now login.");
         navigate("/");
       } else {
-        alert(data.message || "Invalid OTP or error resetting password");
+        alert(result.message || "Invalid OTP or error resetting password");
       }
     } catch (err) {
-      alert("Server error");
+      alert("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

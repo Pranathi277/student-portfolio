@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 import "../styles/login.css";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  // ✅ state (you were missing this)
   const [login, setLogin] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   
   // Captcha state
   const [captchaText, setCaptchaText] = useState("");
@@ -31,47 +32,43 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (userCaptcha !== captchaAnswer) {
+    if (userCaptcha.trim().toLowerCase() !== captchaAnswer.toLowerCase()) {
       alert("Incorrect CAPTCHA answer!");
       generateCaptcha();
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await fetch(import.meta.env.VITE_API_BASE_URL + "/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: login.email,
-          password: login.password,
-        }),
+      const result = await apiService.login({
+        email: login.email,
+        password: login.password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (result.success) {
+        const data = result.user;
 
         localStorage.setItem("user", JSON.stringify(data));
-        localStorage.setItem("userName", data.name);
-        //Authentication state management
-        //sm - track the user data and login status in localStorage for session persistence across page reloads and browser sessions. This allows the app to remember the user and maintain their logged-in state until they choose to log out or clear their browser data.
+        localStorage.setItem("userName", data.name || data.email.split("@")[0]);
         localStorage.setItem("currentUser", data.email);
         localStorage.setItem("loggedIn", "true");
-//error handling - alert for successful login and invalid credentials
-        alert("Login Successful!");
-        navigate("/dashboard"); // keep safe (or "/dashboard" if exists)
-      } else {
-        alert("Invalid Credentials");
-      }
 
+        alert("Login Successful!");
+        navigate("/dashboard");
+      } else {
+        alert(result.message || "Invalid Credentials");
+        generateCaptcha();
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Server error");
+      alert("An error occurred. Please try again.");
+      generateCaptcha();
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ return INSIDE function
   return (
     <div className="login-wrapper">
       <div className="login-card">
@@ -134,7 +131,9 @@ export default function Login() {
 
           <p className="forgot" style={{ cursor: 'pointer' }} onClick={() => navigate("/forgot-password")}>Forgot Password?</p>
 
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
 
         <p className="signup-text">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
 import "../styles/form.css";
 import "../styles/dashboard.css";
 
@@ -103,21 +104,12 @@ export default function UploadProject() {
         authorEmail: email
       };
 
-      await fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProject)
-      });
+      await apiService.createProject(newProject);
       
-//crud operation -Post-to delete the project
-      await fetch(import.meta.env.VITE_API_BASE_URL + "/api/activities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "Uploaded new project",
-          projectTitle: formData.title,
-          timestamp: new Date().toISOString()
-        })
+      await apiService.createActivity({
+        type: "Uploaded new project",
+        projectTitle: formData.title,
+        timestamp: new Date().toISOString()
       });
       
       // Reset form

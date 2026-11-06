@@ -3,6 +3,8 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import "../styles/dashboard.css";
 import "../styles/myprojects.css";
 import Sidebar from "../components/Sidebar";
+import apiService from "../services/api";
+
 export default function MyProjects() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,13 +21,10 @@ export default function MyProjects() {
   const userName = localStorage.getItem("userName") || email.split("@")[0];
 
   const loadUserProjects = async () => {
-    const currentUserEmail = localStorage.getItem("currentUser");
+    const currentUserEmail = localStorage.getItem("currentUser") || email;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/user/${currentUserEmail}`);
-      if (response.ok) {
-        const userProjects = await response.json();
-        setProjects(userProjects);
-      }
+      const userProjects = await apiService.getUserProjects(currentUserEmail);
+      setProjects(userProjects || []);
     } catch (error) {
       console.error("Failed to load user projects", error);
     }
@@ -49,11 +48,12 @@ export default function MyProjects() {
     console.debug("MyProjects: navigating to project id=", id);
     navigate(`/project/${id}`);
   };
-//crud operation -Delete
+
+  // CRUD operation - Delete
   const deleteProject = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/projects/${id}`, { method: 'DELETE' });
+        await apiService.deleteProject(id);
         loadUserProjects();
       } catch (error) {
         console.error("Failed to delete project", error);

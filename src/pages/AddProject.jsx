@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiService from "../services/api";
 import "../styles/form.css";
 import "../styles/layout.css";
 
@@ -9,25 +10,21 @@ export default function AddProject() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
 
-  const saveProject = () => {
-  fetch(import.meta.env.VITE_API_BASE_URL + "/api/projects", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      title: title,
-      description: desc,
-      student: {
-        id: 2
-      }
-    })
-  })
-  .then(res => res.json())
-  .then(() => {
-    navigate("/my-projects"); // keep your flow
-  });
-};
+  const saveProject = async () => {
+    try {
+      await apiService.createProject({
+        title: title,
+        description: desc,
+        tech: ["React"],
+        author: localStorage.getItem("userName") || "Student",
+        authorEmail: localStorage.getItem("currentUser") || "student@example.com"
+      });
+      navigate("/projects");
+    } catch (err) {
+      console.error(err);
+      navigate("/projects");
+    }
+  };
 
   return (
     <div className="form">
